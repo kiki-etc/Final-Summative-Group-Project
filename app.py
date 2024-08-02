@@ -10,8 +10,25 @@
 # MacOS (NO GPU)
 # !pip install numpy matplotlib torch torchvision torchaudio
 
+import subprocess
+import sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+required_packages = ['numpy', 'matplotlib', 'torch', 'torchvision', 'torchaudio', 'flask', 'transformers', 'os']
+
+for package in required_packages:
+    try:
+        __import__(package)
+    except ImportError:
+        install(package)
+
 from flask import Flask, request, jsonify, send_file, render_template
+
 import torch
+import torch.nn as nn
+
 from torchvision.utils import save_image
 from transformers import BertTokenizer
 import os
