@@ -76,12 +76,12 @@ Project/
    python -c "from transformers import BertTokenizer; BertTokenizer.from_pretrained('bert-base-uncased')"
    ```
 
-## Training the Model
+## Training the Model (already done)
 
 1. Preparing the dataset:
    - Images were placed in the `dataset/images/` directory and the corresponding text descriptions in the `dataset/text/` directory.
 
-2. The trained model weights will be saved as `generator.pth` and `discriminator.pth`.
+2. The trained model weights were saved as `generator.pth` and `discriminator.pth`.
 
 ## Running the Application
 
