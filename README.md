@@ -56,8 +56,8 @@ Project/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/text-to-image-gan.git
-   cd text-to-image-gan
+   git clone https://github.com/kiki-etc/Final-Summative-Group-Project
+   cd Final-Summative-Group-Project
    ```
 
 2. Create a virtual environment:
@@ -78,16 +78,10 @@ Project/
 
 ## Training the Model
 
-1. Prepare your dataset:
-   - Place your images in the `dataset/images/` directory.
-   - Place the corresponding text descriptions in the `dataset/text/` directory. Ensure that the text filenames match the image filenames (e.g., `image1.png` and `image1.txt`).
+1. Preparing the dataset:
+   - Images were placed in the `dataset/images/` directory and the corresponding text descriptions in the `dataset/text/` directory.
 
-2. Run the training script:
-   ```bash
-   python train.py
-   ```
-
-3. The trained model weights will be saved as `generator.pth` and `discriminator.pth`.
+2. The trained model weights will be saved as `generator.pth` and `discriminator.pth`.
 
 ## Running the Application
 
@@ -117,15 +111,3 @@ Project/
 ## Acknowledgements
 
 This project uses pre-trained models from the Hugging Face Transformers library and is inspired by various GAN implementations in the deep learning community.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-Feel free to open an issue if you encounter any problems or have questions about the implementation.
-
----
-
-Thank you for using the Text-to-Image Generator! Enjoy creating images from your text descriptions!
