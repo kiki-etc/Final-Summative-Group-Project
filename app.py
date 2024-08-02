@@ -10,25 +10,9 @@
 # MacOS (NO GPU)
 # !pip install numpy matplotlib torch torchvision torchaudio
 
-import subprocess
-import sys
-
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-required_packages = ['numpy', 'flask', 'matplotlib', 'torch', 'torchvision', 'torchaudio', 'flask', 'transformers', 'os']
-
-for package in required_packages:
-    try:
-        __import__(package)
-    except ImportError:
-        install(package)
-
-from flask import Flask, request, send_file, render_template
-
+from flask import Flask, request, jsonify, send_file, render_template
 import torch
 import torch.nn as nn
-
 from torchvision.utils import save_image
 from transformers import BertTokenizer
 import os
@@ -94,9 +78,10 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    description = request.form['description']
+    data = request.get_json()
+    description = data['description']
     images = generate_images(description)
-    return render_template('index.html', images=images, description=description)
+    return jsonify(images=images)
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):
