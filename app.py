@@ -16,7 +16,7 @@ import sys
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-required_packages = ['numpy', 'matplotlib', 'torch', 'torchvision', 'torchaudio', 'flask', 'transformers', 'os']
+required_packages = ['numpy', 'flask', 'matplotlib', 'torch', 'torchvision', 'torchaudio', 'flask', 'transformers', 'os']
 
 for package in required_packages:
     try:
@@ -24,7 +24,7 @@ for package in required_packages:
     except ImportError:
         install(package)
 
-from flask import Flask, request, jsonify, send_file, render_template
+from flask import Flask, request, send_file, render_template
 
 import torch
 import torch.nn as nn
