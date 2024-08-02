@@ -1,3 +1,15 @@
+# Uncomment and run the appropriate command for your operating system, if required
+# No installation is reqiured on Google Colab / Kaggle notebooks
+
+# Linux / Binder / Windows (No GPU)
+# !pip install numpy matplotlib torch==1.7.0+cpu torchvision==0.8.1+cpu torchaudio==0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
+
+# Linux / Windows (GPU)
+# pip install numpy matplotlib torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+ 
+# MacOS (NO GPU)
+# !pip install numpy matplotlib torch torchvision torchaudio
+
 from flask import Flask, request, jsonify, send_file, render_template
 import torch
 from torchvision.utils import save_image
