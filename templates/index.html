@@ -2,22 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text to Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .images {
+            margin-top: 20px;
+        }
+        .images img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Text to Image Generator</h1>
-    <form method="POST" action="/generate">
-        <label for="description">Enter a description:</label><br>
-        <input type="text" id="description" name="description" required><br><br>
-        <input type="submit" value="Generate Images">
-    </form>
-
-    {% if images %}
-        <h2>Generated Images for "{{ description }}"</h2>
-        {% for image in images %}
-            <img src="{{ url_for('serve_image', filename=image) }}" alt="Generated Image">
-        {% endfor %}
-    {% endif %}
+    <div class="container">
+        <h1>Text to Image Generator</h1>
+        <form id="generate-form">
+            <input type="text" id="description" placeholder="Enter a description..." required>
+            <input type="submit" value="Generate Images">
+        </form>
+        <div class="images" id="images"></div>
+    </div>
+    <script>
+        document.getElementById('generate-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const description = document.getElementById('description').value;
+            fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ description: description })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const imagesDiv = document.getElementById('images');
+                imagesDiv.innerHTML = '';
+                data.images.forEach(imgPath => {
+                    const img = document.createElement('img');
+                    img.src = `/images/${imgPath.split('/').pop()}`;
+                    imagesDiv.appendChild(img);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
