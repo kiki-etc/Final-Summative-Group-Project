@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Image Generator</title>
+</head>
+<body>
+    <h1>Text to Image Generator</h1>
+    <form method="POST" action="/generate">
+        <label for="description">Enter a description:</label><br>
+        <input type="text" id="description" name="description" required><br><br>
+        <input type="submit" value="Generate Images">
+    </form>
+
+    {% if images %}
+        <h2>Generated Images for "{{ description }}"</h2>
+        {% for image in images %}
+            <img src="{{ url_for('serve_image', filename=image) }}" alt="Generated Image">
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
