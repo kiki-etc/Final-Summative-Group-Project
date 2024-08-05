@@ -1,35 +1,26 @@
-# Uncomment and run the appropriate command for your operating system, if required
-# No installation is reqiured on Google Colab / Kaggle notebooks
-
-# Linux / Binder / Windows (No GPU)
-# !pip install numpy matplotlib torch==1.7.0+cpu torchvision==0.8.1+cpu torchaudio==0.7.0 -f https://download.pytorch.org/whl/torch_stable.html
-
-# Linux / Windows (GPU)
-# pip install numpy matplotlib torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
- 
-# MacOS (NO GPU)
-# !pip install numpy matplotlib torch torchvision torchaudio
-
 from flask import Flask, request, jsonify, send_file, render_template
 import torch
 import torch.nn as nn
 from torchvision.utils import save_image
-from transformers import BertTokenizer
 import os
+import json
 
 app = Flask(__name__)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Load models
+# Load the tokenizer
+with open('tokenizer.json', 'r') as f:
+    word_to_idx = json.load(f)
+text_dim = len(word_to_idx)
+
 latent_dim = 100
-text_dim = 768  # BERT base model output dimension
 
 class Generator(nn.Module):
     def __init__(self, latent_dim, text_dim, img_channels):
         super(Generator, self).__init__()
-        self.text_embedding = nn.Linear(text_dim, latent_dim)
+        self.text_embedding = nn.Embedding(text_dim, latent_dim)
         self.gen = nn.Sequential(
-            nn.ConvTranspose2d(latent_dim, 512, 4, 1, 0),
+            nn.ConvTranspose2d(latent_dim * 2, 512, 4, 1, 0),
             nn.BatchNorm2d(512),
             nn.ReLU(True),
             nn.ConvTranspose2d(512, 256, 4, 2, 1),
@@ -46,7 +37,7 @@ class Generator(nn.Module):
         )
 
     def forward(self, noise, text):
-        text_embedding = self.text_embedding(text)
+        text_embedding = self.text_embedding(text).sum(dim=1)
         x = torch.cat([noise, text_embedding], dim=1)
         x = x.unsqueeze(2).unsqueeze(3)
         return self.gen(x)
@@ -56,12 +47,10 @@ generator.load_state_dict(torch.load('generator.pth', map_location=device))
 generator.to(device)
 generator.eval()
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-
 def generate_images(description, num_images=3):
-    tokens = tokenizer(description, return_tensors='pt', padding='max_length', truncation=True, max_length=128)
-    text_ids = tokens['input_ids'].to(device)
-    noise = torch.randn(num_images, 100).to(device)
+    tokens = [word_to_idx[word] for word in description.lower().split(', ') if word in word_to_idx]
+    text_ids = torch.tensor(tokens).to(device).unsqueeze(0)
+    noise = torch.randn(num_images, latent_dim).to(device)
     with torch.no_grad():
         images = generator(noise, text_ids.repeat(num_images, 1))
     os.makedirs('generated', exist_ok=True)
