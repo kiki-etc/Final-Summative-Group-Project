@@ -1,1 +1,0 @@
-pattern, geometric, flat, two-dimensional, round, circles, green, red
