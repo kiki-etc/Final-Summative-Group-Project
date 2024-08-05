@@ -35,6 +35,10 @@
             height: auto;
             margin: 10px 0;
         }
+        .error {
+            color: red;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -45,6 +49,7 @@
             <input type="submit" value="Generate Images">
         </form>
         <div class="images" id="images"></div>
+        <div class="error" id="error"></div>
     </div>
     <script>
         document.getElementById('generate-form').addEventListener('submit', function(event) {
@@ -60,12 +65,23 @@
             .then(response => response.json())
             .then(data => {
                 const imagesDiv = document.getElementById('images');
+                const errorDiv = document.getElementById('error');
                 imagesDiv.innerHTML = '';
-                data.images.forEach(imgPath => {
-                    const img = document.createElement('img');
-                    img.src = `/images/${imgPath.split('/').pop()}`;
-                    imagesDiv.appendChild(img);
-                });
+                errorDiv.innerHTML = '';
+
+                if (data.error) {
+                    errorDiv.textContent = 'Error: ' + data.error;
+                } else {
+                    data.images.forEach(imgPath => {
+                        const img = document.createElement('img');
+                        img.src = `/images/${imgPath.split('/').pop()}`;
+                        imagesDiv.appendChild(img);
+                    });
+                }
+            })
+            .catch(error => {
+                const errorDiv = document.getElementById('error');
+                errorDiv.textContent = 'An error occurred: ' + error.message;
             });
         });
     </script>
