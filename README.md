@@ -1,9 +1,12 @@
 # Final Summative Group Project
- Introduction to Artificial Intelligence Summative: Implementation and Testing
+Introduction to Artificial Intelligence Summative: Implementation and Testing
 
 # Text-to-Image Generator using GANs
 
 This project implements a Text-to-Image Generator using Generative Adversarial Networks (GANs). The application uses a deep learning model to generate images based on textual descriptions. It consists of a training script to train the GANs and a Flask web application to interact with the trained model.
+
+Here's the video:
+https://youtu.be/v_bp0ZL8p7w
 
 ## Table of Contents
 
@@ -45,12 +48,14 @@ Project/
 ## Requirements
 
 - Python 3.7+
+- An Anaconda Environment
 - PyTorch
 - torchvision
 - transformers
 - Flask
 - PIL (Pillow)
 - matplotlib
+- google-cloud-aiplatform
 
 ## Installation
 
@@ -61,17 +66,29 @@ Project/
    ```
 
 2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
+   - **macOS:**
+     ```bash
+     python3 -m venv venv
+     source venv/bin/activate
+     ```
+   - **Windows:**
+     ```bash
+     python -m venv venv
+     venv\Scripts\activate
+     ```
 
 3. Install the required packages:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Download the pre-trained BERT tokenizer:
+4. If `requirements.txt` is not available, manually install the required packages. It is recommended to do so in an Anaconda global environment:
+   ```bash
+   pip install flask numpy matplotlib torch torchvision torchaudio transformers pillow
+   conda install conda-forge::google-cloud-aiplatform
+   ```
+
+5. Download the pre-trained BERT tokenizer:
    ```bash
    python -c "from transformers import BertTokenizer; BertTokenizer.from_pretrained('bert-base-uncased')"
    ```
@@ -86,9 +103,14 @@ Project/
 ## Running the Application
 
 1. Ensure that the virtual environment is activated:
-   ```bash
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
+   - **macOS:**
+     ```bash
+     source venv/bin/activate
+     ```
+   - **Windows:**
+     ```bash
+     venv\Scripts\activate
+     ```
 
 2. Run the Flask application:
    ```bash
@@ -111,3 +133,6 @@ Project/
 ## Acknowledgements
 
 This project uses pre-trained models from the Hugging Face Transformers library and is inspired by various GAN implementations in the deep learning community.
+```
+
+By following these instructions, you should be able to set up the environment and run the project on both macOS and Windows systems.

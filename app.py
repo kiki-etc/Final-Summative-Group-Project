@@ -1,17 +1,25 @@
+import subprocess
+import sys
+import logging
+
+# Import installed packages
 from flask import Flask, request, jsonify, send_file, render_template
 import torch
 import torch.nn as nn
 from torchvision.utils import save_image
 import os
 import json
+import vertexai
+from vertexai.preview.vision_models import ImageGenerationModel
 
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Initialize Flask app
 app = Flask(__name__)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Load the tokenizer
-with open('tokenizer.json', 'r') as f:
-    word_to_idx = json.load(f)
-text_dim = len(word_to_idx)
+text_dim = 4
 
 latent_dim = 100
 
@@ -43,21 +51,31 @@ class Generator(nn.Module):
         return self.gen(x)
 
 generator = Generator(latent_dim, text_dim, 3)
-generator.load_state_dict(torch.load('generator.pth', map_location=device))
-generator.to(device)
-generator.eval()
+# generator.load_state_dict(torch.load('generator.pth', map_location=device))
+# generator.to(device)
+# generator.eval()
+
+PROJECT_ID = "intro-to-ai-431719"  # @param {type:"string"}
+LOCATION = "us-central1"  # @param {type:"string"}
+
+vertexai.init(project=PROJECT_ID, location=LOCATION)
+generation_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
 
 def generate_images(description, num_images=3):
-    tokens = [word_to_idx[word] for word in description.lower().split(', ') if word in word_to_idx]
-    text_ids = torch.tensor(tokens).to(device).unsqueeze(0)
-    noise = torch.randn(num_images, latent_dim).to(device)
-    with torch.no_grad():
-        images = generator(noise, text_ids.repeat(num_images, 1))
+    prompt = f"2D african art {description}"
+    response = generation_model.generate_images(
+        prompt=prompt,
+        number_of_images=num_images,
+        seed=42,
+        add_watermark=False,
+    )
+    
     os.makedirs('generated', exist_ok=True)
     file_paths = []
-    for i in range(num_images):
+    for i, image in enumerate(response.images):
         file_path = f'generated/{description.replace(" ", "_")}_{i}.png'
-        save_image(images[i], file_path, normalize=True)
+        with open(file_path, 'wb') as f:
+            f.write(image)
         file_paths.append(file_path)
     return file_paths
 
@@ -67,14 +85,23 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    data = request.get_json()
-    description = data['description']
-    images = generate_images(description)
-    return jsonify(images=images)
+    try:
+        data = request.get_json()
+        description = data['description']
+        images = generate_images(description)
+        return jsonify(images=images)
+    except Exception as e:
+        logging.error(f"Error in /generate: {e}")
+        return jsonify(error=str(e)), 500
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):
-    return send_file(os.path.join('generated', filename), mimetype='image/png')
+    try:
+        return send_file(os.path.join('generated', filename), mimetype='image/png')
+    except Exception as e:
+        logging.error(f"Error serving image {filename}: {e}")
+        return jsonify(error=str(e)), 500
 
 if __name__ == '__main__':
+    logging.info("Starting Flask app...")
     app.run(debug=True)
